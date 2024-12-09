@@ -1,12 +1,3 @@
-tôi muốn viết một operator bằng go với nhưng yêu cầu sau:
-1/ Phục vụ cho k8s
-2/ Chức năng dùng để graceful shutdown những pod có container main có memory usage so với limit cao, hoặc là so với request cao. Phần này cần một biến được tạo để chọn là dựa trên request hay limit.
-3/ Phải đảm bảo là 1 pod mới được tạo ra và chạy với trạng thái sẳn sàng nhận request trước khi terminate pod cũ.
-4/ Mục tiêu là phải trả về số lượng pod mong đợi thực tế để không gây tốn tài nguyên.
-5/ các giai đoạn phải kèm thêm các log 
-
-
-
 Các vấn đề:
 - Trước khi thực hiện kiểm tra xem có đang có pod nào bị lỗi không.
 - Khi tăng pod mới và xóa pod cũ dùng cơ chế nào phù hợp. Nếu tăng replica của deployment thì sẽ bị down nếu HPA thấy dư resource cần.
