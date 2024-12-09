@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kill-pod-high-mem-now
+  namespace: default
+spec:
+  completions: 1          # Số lần job cần hoàn thành
+  parallelism: 1          # Số lượng pod có thể chạy song song
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: kill-pod-hm-sa
+      containers:
+      - name: kill-pod-high-mem
+        image: docker.io/se62565/khpm1:latest  # Thay thế bằng image của bạn
+        resources:
+          requests:
+            memory: "64Mi"    # Mức bộ nhớ yêu cầu tối thiểu
+            cpu: "250m"  
+        env:
+        - name: LOCAL
+          value: "false"
+        - name: PERCENT_THRESHOLD
+          value: "80"
+        - name: TIME_DELETE_WAITING
+          value: "5"
+        - name: CHECK_BY
+          value: "request"
+        - name: TIME_INTERVAL
+          value: "300"
+      restartPolicy: OnFailure  # Hoặc 'Never' nếu không muốn tự động khởi động lại khi thất bại

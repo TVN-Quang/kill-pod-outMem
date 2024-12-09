@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx2-deployment
+  labels:
+    app: nginx2
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx2
+  template:
+    metadata:
+      labels:
+        app: nginx2
+    spec:
+      containers:
+      - name: main
+        image: nginx:1.25.1
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "5Mi"   # Yêu cầu bộ nhớ tối thiểu
+            cpu: "250m"      # Yêu cầu CPU tối thiểu
+          limits:
+            memory: "128Mi"  # Giới hạn bộ nhớ tối đa
+            cpu: "500m"      # Giới hạn CPU tối đa
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx2-hpa
+  labels:
+    app: nginx2
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx2-deployment
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50

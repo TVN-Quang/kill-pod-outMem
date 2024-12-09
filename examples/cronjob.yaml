@@ -1,0 +1,78 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kill-pod-high-mem
+  namespace: default
+spec:
+  schedule: "*/30 * * * *"  # Lên lịch chạy mỗi 30 phút
+  successfulJobsHistoryLimit: 1  # Giữ lại 1 pod thành công
+  failedJobsHistoryLimit: 1      # Giữ lại 1 pod thất bại
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: kill-pod-hm-sa
+          containers:
+          - name: kill-pod-high-mem
+            image: docker.io/se62565/khpm1:latest  # Thay thế bằng image của bạn
+            resources:
+              requests:
+                memory: "64Mi"    # Mức bộ nhớ yêu cầu tối thiểu
+                cpu: "250m"  
+            env:
+            - name: LOCAL
+              value: "false"
+            - name: PERCENT_THRESHOLD
+              value: "80"
+            - name: TIME_DELETE_WAITING
+              value: "5"
+            - name: CHECK_BY
+              value: "request"
+            - name: TIME_INTERVAL
+              value: "300"
+          restartPolicy: OnFailure  # Hoặc 'Never' nếu không muốn tự động khởi động lại khi thất bại
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kill-pod-hm-sa
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: nginx
+  name: pod-list-role
+rules:
+  - apiGroups: [""]  # Tài nguyên chính (core API group)
+    resources: ["pods"]
+    verbs: ["get", "list", "update", "delete"]
+
+  # Quyền cho HPA (Horizontal Pod Autoscaler)
+  - apiGroups: ["autoscaling"]
+    resources: ["horizontalpodautoscalers"]
+    verbs: ["get", "list", "watch", "update"]
+
+  # Quyền lấy metrics của Pods (cho HPA hoặc custom metrics)
+  - apiGroups: ["metrics.k8s.io"]  # Metrics API group
+    resources: ["pods"]
+    verbs: ["get"]
+
+  # Quyền truy cập thông tin Scale (cho HPA)
+  - apiGroups: ["apps", "extensions"]
+    resources: ["deployments/scale", "replicasets/scale", "statefulsets/scale"]
+    verbs: ["get", "list", "watch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-list-role-binding
+  namespace: nginx
+subjects:
+  - kind: ServiceAccount
+    name: kill-pod-hm-sa
+    namespace: default
+roleRef:
+  kind: Role
+  name: pod-list-role
+  apiGroup: rbac.authorization.k8s.io

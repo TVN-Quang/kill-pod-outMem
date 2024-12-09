@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: main
+        image: nginx:1.25.1
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"   # Yêu cầu bộ nhớ tối thiểu
+            cpu: "250m"      # Yêu cầu CPU tối thiểu
+          limits:
+            memory: "128Mi"  # Giới hạn bộ nhớ tối đa
+            cpu: "500m"      # Giới hạn CPU tối đa
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa
+  labels:
+    app: nginx
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50
