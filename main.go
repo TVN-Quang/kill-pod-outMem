@@ -310,12 +310,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error creating metrics client: %v", err)
 	}
-
-	// Thời gian lặp lại
-	timeInterval := helper.GetEnvAsInt("TIME_INTERVAL", 30)
-	ticker := time.NewTicker(time.Duration(timeInterval) * time.Second)
-	defer ticker.Stop()
-
 	// Lấy danh sách pods từ namespace
 	pods, err := clientset.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -325,7 +319,6 @@ func main() {
 	for _, pod := range pods.Items {
 		podNames = append(podNames, pod.Name)
 	}
-
 	// Kiểm tra và xử lý từng pod
 	for _, pod := range pods.Items {
 		processPod(clientset, metricsClient, &pod, checkBy, pollInterval)
