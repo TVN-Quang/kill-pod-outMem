@@ -75,7 +75,7 @@ spec:
   maxReplicas: 5
   targetCPUUtilizationPercentage: 50
 ```
-
+-------------------
 # Luồng hoạt động
 1. Lấy danh sách pods từ namespace
 2. Duyệt qua các pod và lấy tên pod lưu vào 1 mãng, để sau đó kiểm tra pod mới đã ready chưa khi tăng hpa vì có độ trễ sau khi tăng pod => lấy pod đang có thay vì pod mới được tạo.
