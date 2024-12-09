@@ -9,8 +9,19 @@ Script Go này được thiết kế để kiểm tra trạng thái của các P
 - Metrics Server đã được triển khai trên cluster (để cung cấp cácsố liệu CPU/Memory)
     
 ## 2. Thư viện Go (Dependencies):
-- k8s.io/client-go - Để tương tác với Kubernetes API.
-- k8s.io/api - Để sử dụng các kiểu đối tượng Kubernetes như Pod, Namespace, ResourceMetrics.
+- `k8s.io/client-go`: Cung cấp các công cụ để thiết lập kết nối, xử lý xác thực, và cấu hình các client, nhưng không cung cấp các client cụ thể cho các tài nguyên Kubernetes.
+
+- `k8s.io/api`: Để sử dụng các kiểu đối tượng Kubernetes như Pod, Namespace, ResourceMetrics. Thư viện này chứa các kiểu dữ liệu API của Kubernetes, giúp bạn định nghĩa và thao tác với các đối tượng Kubernetes.
+
+- `metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"`: Thư viện cung cấp các đối tượng và công cụ liên quan đến metadata của các đối tượng Kubernetes, chẳng hạn như tên, nhãn, tên không gian, và các thuộc tính khác cần thiết để quản lý tài nguyên.
+
+- `k8s.io/metrics/pkg/client/clientset/versioned`: Để lấy thông tin chỉ số (metrics) từ các tài nguyên Kubernetes. Thư viện này giúp bạn theo dõi việc sử dụng tài nguyên (CPU, Memory) của các Pods hoặc các đối tượng khác trong cluster.
+
+- `k8s.io/client-go/kubernetes`: Cung cấp các hàm giúp tương tác với các tài nguyên Kubernetes như Pods, Deployments, Services, và nhiều đối tượng khác thông qua các client trong Kubernetes.
+
+- `k8s.io/client-go/rest`: Thư viện hỗ trợ cấu hình và tạo kết nối RESTful đến Kubernetes API server, giúp thiết lập các kết nối với cluster và xử lý thông tin xác thực khi kết nối.
+
+- `k8s.io/client-go/tools/clientcmd`: Hỗ trợ sử dụng và cấu hình các tệp kubeconfig để kết nối với Kubernetes cluster, giúp việc xác thực và quản lý thông tin cấu hình kết nối trở nên dễ dàng hơn.
 
 ## 3. Quyền truy cập
 - ServiceAccount có quyền:
