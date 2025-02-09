@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: node-app
+  template:
+    metadata:
+      labels:
+        app: node-app
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: node-app
+        image: docker.io/se62565/connection
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "28Mi"
+          limits:
+            cpu: "515m"
+            memory: "50Mi"
+        env:
+        - name: DB_URL
+          value: "mongodb://192.168.65.254:27017"
+        - name: DELAY_TIME
+          value: "5000"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-service
+spec:
+  selector:
+    app: node-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: NodePort
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: node-app
+  labels:
+    app: node-app
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: node-app
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 180

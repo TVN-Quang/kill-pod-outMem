@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx2-deployment
+  namespace: nginx
+  labels:
+    app: nginx2-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx2-deployment
+  template:
+    metadata:
+      labels:
+        app: nginx2-deployment
+    spec:
+      terminationGracePeriodSeconds: 30
+      initContainers:
+        - name: init-html
+          image: busybox
+          command: ["sh", "-c", "echo '<html><head><title>Pod Info</title></head><body><h1>Hello from Pod: $(POD_NAME)</h1></body></html>' > /usr/share/nginx/html/index.html"]
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: html-volume
+              mountPath: /usr/share/nginx/html
+      containers:
+        - name: main
+          image: nginx:1.25.1
+          ports:
+            - containerPort: 80
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
+            requests:
+              cpu: "250m"
+              memory: "10Mi"
+          volumeMounts:
+            - mountPath: /usr/share/nginx/html
+              name: html-volume
+      volumes:
+        - name: html-volume
+          emptyDir: {}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx2-hpa
+  labels:
+    app: nginx2-deployment
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx2-deployment
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 25
+          periodSeconds: 600

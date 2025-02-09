@@ -1,0 +1,7 @@
+1/ chạy command tạo ví dụ: `kubectl apply -f examples\script-graceful -n nginx`
+2/ giá trị của nginx trong ví dụ request: 5Mi để test trường hợp xóa pod
+3/ check log: `kubectl logs -l app=nginx2 -n nginx -f`
+4/ kiểm tra pod có label: kubectl get po -l app=nginx2 -n nginx
+5/ kiểm tra số pod thực tế: kubectl get po -n nginx
+
+kubectl get po -n nginx

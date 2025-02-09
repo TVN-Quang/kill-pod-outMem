@@ -33,6 +33,25 @@ func GetEnvAsInt(key string, defaultValue int) int {
 	return intValue
 }
 
+func GetEnvAsFloat(key string, defaultValue float64) float64 {
+	// Lấy giá trị của biến môi trường
+	envValue := os.Getenv(key)
+	if envValue == "" {
+		// Nếu không có giá trị trong môi trường, trả về giá trị mặc định
+		return defaultValue
+	}
+
+	// Chuyển đổi giá trị từ chuỗi thành float64
+	value, err := strconv.ParseFloat(envValue, 64)
+	if err != nil {
+		// Nếu không thể chuyển đổi, ghi log và trả về giá trị mặc định
+		log.Printf("Cảnh báo: Không thể chuyển đổi giá trị '%s' từ biến môi trường %s thành float64. Trả về giá trị mặc định: %v", envValue, key, defaultValue)
+		return defaultValue
+	}
+
+	return value
+}
+
 // parseMemory chuyển đổi giá trị memory từ dạng string (e.g., "123456Ki") sang byte
 func ParseMemory(memoryStr string) int64 {
 	// Xử lý chuỗi trống

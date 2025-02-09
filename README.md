@@ -465,3 +465,6 @@ nếu thất bại thì phải cho vào hàng đợi + gửi mail.
 Thêm lưu trữ để lưu lại các pod mà lỗi nếu số lượng nhiều thì không thực hiện nữa. Mà alert critical.
 Lưu trữ các pod đã được tìm thấy trước đó để tìm kiếm 
 Node có đủ resource để thêm pod không?
+
+scale lên bằng deployment replica sau 10s tự down, kể cả khi thiết lập down policy là 5 phút.
+scale lên và xóa label luôn thì không biết pod đã chạy chưa

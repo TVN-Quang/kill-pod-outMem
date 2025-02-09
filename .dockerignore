@@ -1,6 +1,8 @@
 examples
 .vscode
 pods.json
-README.md
+README.*
 .env
 Dockerfile
+test
+step.txt

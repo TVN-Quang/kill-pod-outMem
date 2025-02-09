@@ -22,12 +22,20 @@ spec:
         env:
         - name: LOCAL
           value: "false"
-        - name: PERCENT_THRESHOLD
+        - name: POD_DELETE_PERCENT_THRESHOLD
           value: "80"
-        - name: TIME_DELETE_WAITING
+        - name: POD_DELETE_WAIT_TIME
           value: "5"
         - name: CHECK_BY
           value: "request"
-        - name: TIME_INTERVAL
-          value: "300"
+        - name: LABEL_SELECTOR_HPA
+          value: "app"
+        - name: RESOURCE_CHECK_TYPE
+          value: "container"
+        - name: TIME_TO_WAIT_POD_CREATE
+          value: 3
+        - name: TIME_TO_WAIT_POD_READY
+          value: 3
+        - name: DEPLOYMENT_SELECTOR_LABEL
+          value: app
       restartPolicy: OnFailure  # Hoặc 'Never' nếu không muốn tự động khởi động lại khi thất bại

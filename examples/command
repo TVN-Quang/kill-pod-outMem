@@ -1,0 +1,5 @@
+minikube ssh 'grep host.minikube.internal /etc/hosts | cut -f1'
+
+kubectl label po node-app-869f568c6f-89k55 app-
+
+minikube service nodejs-service --url
